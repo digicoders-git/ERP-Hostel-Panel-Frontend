@@ -14,7 +14,7 @@ const StudentQueries = () => {
   useEffect(() => {
     const savedQueries = JSON.parse(localStorage.getItem('studentQueries') || '[]');
     const savedStudents = JSON.parse(localStorage.getItem('students') || '[]');
-    
+
     // Add some sample queries if none exist
     if (savedQueries.length === 0 && savedStudents.length > 0) {
       const sampleQueries = [
@@ -50,7 +50,7 @@ const StudentQueries = () => {
     } else {
       setQueries(savedQueries);
     }
-    
+
     setStudents(savedStudents);
   }, []);
 
@@ -74,7 +74,7 @@ const StudentQueries = () => {
 
     setQueries(updatedQueries);
     localStorage.setItem('studentQueries', JSON.stringify(updatedQueries));
-    
+
     Swal.fire('Success!', 'Reply sent successfully', 'success');
     setSelectedQuery(null);
     setReplyText('');
@@ -90,14 +90,18 @@ const StudentQueries = () => {
 
     setQueries(updatedQueries);
     localStorage.setItem('studentQueries', JSON.stringify(updatedQueries));
-    
+
     Swal.fire('Success!', `Query status updated to ${newStatus}`, 'success');
   };
 
   const filteredQueries = queries.filter(query => {
-    const matchesSearch = query.studentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         query.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         query.rollNumber.toLowerCase().includes(searchTerm.toLowerCase());
+    const studentName = query.studentName || '';
+    const subject = query.subject || '';
+    const rollNumber = query.rollNumber || '';
+
+    const matchesSearch = studentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      rollNumber.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = filterStatus === 'All' || query.status === filterStatus;
     const matchesCategory = filterCategory === 'All' || query.category === filterCategory;
     return matchesSearch && matchesStatus && matchesCategory;
@@ -146,7 +150,7 @@ const StudentQueries = () => {
             </div>
           </div>
         </div>
-        
+
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center">
             <div className="p-3 bg-yellow-100 rounded-full">
@@ -158,7 +162,7 @@ const StudentQueries = () => {
             </div>
           </div>
         </div>
-        
+
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center">
             <div className="p-3 bg-blue-100 rounded-full">
@@ -170,7 +174,7 @@ const StudentQueries = () => {
             </div>
           </div>
         </div>
-        
+
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center">
             <div className="p-3 bg-green-100 rounded-full">
@@ -298,7 +302,7 @@ const StudentQueries = () => {
               ))}
             </tbody>
           </table>
-          
+
           {filteredQueries.length === 0 && (
             <div className="text-center py-8 text-gray-500">
               No queries found matching your criteria.
@@ -320,7 +324,7 @@ const StudentQueries = () => {
                 <FaTimes />
               </button>
             </div>
-            
+
             <div className="mb-4 p-4 bg-gray-50 rounded-lg">
               <p className="font-medium text-gray-900">{selectedQuery.subject}</p>
               <p className="text-sm text-gray-600 mt-1">{selectedQuery.description}</p>
@@ -328,14 +332,14 @@ const StudentQueries = () => {
                 From: {selectedQuery.studentName} ({selectedQuery.rollNumber})
               </p>
             </div>
-            
+
             {selectedQuery.reply && (
               <div className="mb-4 p-4 bg-blue-50 rounded-lg">
                 <p className="text-sm font-medium text-blue-900">Previous Reply:</p>
                 <p className="text-sm text-blue-800 mt-1">{selectedQuery.reply}</p>
               </div>
             )}
-            
+
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Your Reply
@@ -348,7 +352,7 @@ const StudentQueries = () => {
                 placeholder="Type your reply here..."
               />
             </div>
-            
+
             <div className="flex justify-end space-x-4">
               <button
                 onClick={() => setSelectedQuery(null)}

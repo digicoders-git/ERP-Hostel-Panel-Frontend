@@ -13,7 +13,8 @@ import {
   FaChevronDown,
   FaChevronRight,
   FaPlus,
-  FaQrcode
+  FaQrcode,
+  FaMoneyBillWave
 } from 'react-icons/fa';
 import Swal from 'sweetalert2';
 import { useState } from 'react';
@@ -43,6 +44,7 @@ const Sidebar = ({ isOpen, onLogout, currentPage, setCurrentPage }) => {
     { icon: FaCogs, label: 'Room Management', page: 'roomManagement' },
     { icon: FaClipboardCheck, label: 'Attendance', page: 'attendance' },
     { icon: FaSignInAlt, label: 'Check In/Out', page: 'checkInOut' },
+    { icon: FaMoneyBillWave, label: 'Fee Management', page: 'feeManagement' },
     { icon: FaQuestionCircle, label: 'Student Queries', page: 'studentQueries' },
   ];
 
@@ -84,10 +86,10 @@ const Sidebar = ({ isOpen, onLogout, currentPage, setCurrentPage }) => {
             key={index}
             onClick={() => setCurrentPage(item.page)}
             className={`flex items-center ${isOpen ? 'px-4' : 'justify-center'} py-3 rounded-xl transition-all duration-200 group cursor-pointer ${currentPage === item.page
-                ? 'bg-indigo-600/10 text-indigo-400 border-l-4 border-indigo-600'
-                : 'hover:bg-slate-800/50 hover:text-white border-l-4 border-transparent'
+              ? 'bg-indigo-600/10 text-indigo-400 border-l-4 border-indigo-600'
+              : 'hover:bg-slate-800/50 hover:text-white border-l-4 border-transparent'
               }`}
-            title={!isOpen ? item.label : ''}
+            data-tooltip={!isOpen ? item.label : undefined}
           >
             <item.icon className={`text-lg flex-shrink-0 transition-transform duration-200 group-hover:scale-110 ${isOpen ? 'mr-4' : ''}`} />
             {isOpen && <span className="font-semibold text-[14px]">{item.label}</span>}
@@ -103,8 +105,8 @@ const Sidebar = ({ isOpen, onLogout, currentPage, setCurrentPage }) => {
               setMessDropdownOpen(!messDropdownOpen);
             }}
             className={`flex items-center justify-between ${isOpen ? 'px-4' : 'justify-center'} py-3 rounded-xl transition-all duration-200 group cursor-pointer ${(currentPage.includes('mess') || currentPage === 'menuManagement' || currentPage === 'complaintsManagement' || currentPage === 'messAttendance')
-                ? 'bg-indigo-600/10 text-indigo-400 border-l-4 border-indigo-600'
-                : 'hover:bg-slate-800/50 hover:text-white border-l-4 border-transparent'
+              ? 'bg-indigo-600/10 text-indigo-400 border-l-4 border-indigo-600'
+              : 'hover:bg-slate-800/50 hover:text-white border-l-4 border-transparent'
               }`}
           >
             <div className="flex items-center">
@@ -123,8 +125,8 @@ const Sidebar = ({ isOpen, onLogout, currentPage, setCurrentPage }) => {
                   key={index}
                   onClick={() => setCurrentPage(subItem.page)}
                   className={`flex items-center px-4 py-2.5 rounded-lg transition-all duration-200 cursor-pointer text-[13px] ${currentPage === subItem.page
-                      ? 'text-indigo-400 font-bold bg-indigo-600/5'
-                      : 'text-slate-400 hover:text-white hover:bg-slate-800/30'
+                    ? 'text-indigo-400 font-bold bg-indigo-600/5'
+                    : 'text-slate-400 hover:text-white hover:bg-slate-800/30'
                     }`}
                 >
                   <subItem.icon className="mr-3 text-[12px]" />
@@ -142,7 +144,7 @@ const Sidebar = ({ isOpen, onLogout, currentPage, setCurrentPage }) => {
           <button
             onClick={() => setCurrentPage('changePassword')}
             className={`flex items-center w-full cursor-pointer ${isOpen ? 'px-4' : 'justify-center'} py-3 text-slate-400 hover:bg-slate-800 hover:text-white rounded-xl transition-all duration-200 group`}
-            title={!isOpen ? 'Security Settings' : ''}
+            data-tooltip={!isOpen ? 'Security Settings' : undefined}
           >
             <FaKey className={`text-lg flex-shrink-0 group-hover:rotate-12 duration-200 ${isOpen ? 'mr-4' : ''}`} />
             {isOpen && <span className="font-medium text-[14px]">Security</span>}
@@ -151,7 +153,7 @@ const Sidebar = ({ isOpen, onLogout, currentPage, setCurrentPage }) => {
           <button
             onClick={handleLogout}
             className={`flex items-center w-full cursor-pointer ${isOpen ? 'px-4' : 'justify-center'} py-3 text-slate-400 hover:bg-rose-500/10 hover:text-rose-400 rounded-xl transition-all duration-200 group`}
-            title={!isOpen ? 'Sign Out' : ''}
+            data-tooltip={!isOpen ? 'Sign Out' : undefined}
           >
             <FaSignOutAlt className={`text-lg flex-shrink-0 group-hover:translate-x-1 duration-200 ${isOpen ? 'mr-4' : ''}`} />
             {isOpen && <span className="font-medium text-[14px]">Sign Out</span>}

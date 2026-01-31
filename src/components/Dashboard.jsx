@@ -10,9 +10,10 @@ import ComplaintsManagement from './ComplaintsManagement';
 import MessComplaintQR from './MessComplaintQR';
 import CheckInOut from './CheckInOut';
 import StudentQueries from './StudentQueries';
+import FeeManagement from './FeeManagement';
 import ChangePassword from './ChangePassword';
 import Analytics from './Analytics';
-import { FaUsers, FaBed, FaClipboardCheck, FaUtensils, FaArrowUp, FaClock, FaCheckCircle, FaExclamationTriangle, FaCogs, FaQuestionCircle } from 'react-icons/fa';
+import { FaUsers, FaBed, FaClipboardCheck, FaUtensils, FaArrowUp, FaClock, FaCheckCircle, FaExclamationTriangle, FaCogs, FaQuestionCircle, FaMoneyBillWave } from 'react-icons/fa';
 
 const Dashboard = ({ onLogout }) => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -50,10 +51,16 @@ const Dashboard = ({ onLogout }) => {
             <p className="text-slate-500 font-medium">Monitoring system active for <span className="text-indigo-600 font-bold">{wardenId}</span></p>
           </div>
           <div className="flex items-center gap-2 bg-white p-1.5 rounded-2xl shadow-sm border border-slate-200">
-            <button className="px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition-all">Today's Report</button>
+            <button
+              className="px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition-all"
+              data-tooltip="Download Today's Report"
+            >
+              Today's Report
+            </button>
             <button
               onClick={() => handlePageChange('analytics')}
               className="px-4 py-2 text-slate-600 rounded-xl text-sm font-bold hover:bg-slate-50 transition-all cursor-pointer"
+              data-tooltip="View Detailed Analytics"
             >
               Analytics
             </button>
@@ -128,7 +135,12 @@ const Dashboard = ({ onLogout }) => {
                   <span className="w-2 h-2 bg-indigo-600 rounded-full mr-3 animate-pulse"></span>
                   Activity Logs
                 </h3>
-                <button className="text-indigo-600 text-xs font-bold hover:underline">View All</button>
+                <button
+                  className="text-indigo-600 text-xs font-bold hover:underline"
+                  data-tooltip="View All Activity Logs"
+                >
+                  View All
+                </button>
               </div>
               <div className="p-2">
                 {[
@@ -164,6 +176,7 @@ const Dashboard = ({ onLogout }) => {
                 {[
                   { label: 'Room Audit', icon: FaBed, page: 'roomManagement', color: 'indigo' },
                   { label: 'Mark Attendance', icon: FaClipboardCheck, page: 'attendance', color: 'emerald' },
+                  { label: 'Fee Tracking', icon: FaMoneyBillWave, page: 'feeManagement', color: 'indigo' },
                   { label: 'Mess Control', icon: FaUtensils, page: 'messManagement', color: 'rose' },
                   { label: 'All Queries', icon: FaQuestionCircle, page: 'studentQueries', color: 'amber' },
                 ].map((act, i) => (
@@ -171,6 +184,7 @@ const Dashboard = ({ onLogout }) => {
                     key={i}
                     onClick={() => handlePageChange(act.page)}
                     className="flex items-center justify-between w-full bg-slate-800/50 hover:bg-white hover:text-slate-900 p-4 rounded-2xl transition-all group border border-slate-700/50 hover:border-white shadow-lg"
+                    data-tooltip={`Go to ${act.label}`}
                   >
                     <span className="font-bold text-sm tracking-tight">{act.label}</span>
                     <act.icon className="text-slate-500 group-hover:text-indigo-600 transition-colors" />
@@ -208,6 +222,7 @@ const Dashboard = ({ onLogout }) => {
       case 'complaintsManagement': return <ComplaintsManagement />;
       case 'messComplaintQR': return <MessComplaintQR />;
       case 'checkInOut': return <CheckInOut />;
+      case 'feeManagement': return <FeeManagement />;
       case 'studentQueries': return <StudentQueries />;
       case 'changePassword': return <ChangePassword onNavigate={setCurrentPage} />;
       case 'analytics': return <Analytics onBack={() => handlePageChange('dashboard')} />;
