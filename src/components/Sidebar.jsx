@@ -1,14 +1,14 @@
-import { 
-  FaTachometerAlt, 
-  FaUserPlus, 
-  FaUsers, 
-  FaBed, 
-  FaCogs, 
-  FaClipboardCheck, 
-  FaUtensils, 
-  FaSignInAlt, 
+import {
+  FaTachometerAlt,
+  FaUserPlus,
+  FaUsers,
+  FaBed,
+  FaCogs,
+  FaClipboardCheck,
+  FaUtensils,
+  FaSignInAlt,
   FaQuestionCircle,
-  FaKey, 
+  FaKey,
   FaSignOutAlt,
   FaChevronDown,
   FaChevronRight,
@@ -20,24 +20,20 @@ import { useState } from 'react';
 
 const Sidebar = ({ isOpen, onLogout, currentPage, setCurrentPage }) => {
   const [messDropdownOpen, setMessDropdownOpen] = useState(false);
+
   const handleLogout = () => {
     Swal.fire({
-      title: 'Are you sure?',
-      text: 'You will be logged out of your account',
-      icon: 'warning',
+      title: 'Sign Out?',
+      text: 'Are you sure you want to log out?',
+      icon: 'question',
       showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, logout!'
+      confirmButtonColor: '#4F46E5',
+      cancelButtonColor: '#F43F5E',
+      confirmButtonText: 'Yes, Logout',
+      cancelButtonText: 'Cancel'
     }).then((result) => {
       if (result.isConfirmed) {
-        Swal.fire(
-          'Logged Out!',
-          'You have been successfully logged out.',
-          'success'
-        ).then(() => {
-          onLogout();
-        });
+        onLogout();
       }
     });
   };
@@ -48,92 +44,120 @@ const Sidebar = ({ isOpen, onLogout, currentPage, setCurrentPage }) => {
     { icon: FaClipboardCheck, label: 'Attendance', page: 'attendance' },
     { icon: FaSignInAlt, label: 'Check In/Out', page: 'checkInOut' },
     { icon: FaQuestionCircle, label: 'Student Queries', page: 'studentQueries' },
-    
-    { icon: FaKey, label: 'Change Password', page: 'changePassword' },
   ];
 
   const messSubItems = [
-    { icon: FaPlus, label: 'Menu Management', page: 'menuManagement' },
-    { icon: FaClipboardCheck, label: 'Mess Attendance', page: 'messAttendance' },
+    { icon: FaPlus, label: 'Menu List', page: 'menuManagement' },
+    { icon: FaClipboardCheck, label: 'Daily Attendance', page: 'messAttendance' },
     { icon: FaQuestionCircle, label: 'Complaints', page: 'complaintsManagement' },
-    { icon: FaQrcode, label: 'QR for Complaints', page: 'messComplaintQR' },
+    { icon: FaQrcode, label: 'Complaint QR', page: 'messComplaintQR' },
   ];
-  
+
   return (
-    <div className={`fixed left-0 top-0 h-full bg-gray-900 text-white transition-all duration-300 z-50 overflow-y-auto flex flex-col ${
-      isOpen ? 'w-64' : 'w-16'
-    }`}>
-      <div className="p-4 flex flex-col flex-shrink-0  ">
-        <h2 className={`font-bold text-xl ${isOpen ? 'block' : 'hidden'} flex items-center justify-center`}>
-          <FaBed className="mr-2" />
-          Hostel Panel
-        </h2>
-        <span className={`text-sm ${isOpen ? 'block' : 'hidden'} flex items-center justify-center`}>ERP SCHOOL SYSTEM</span>
+    <div className={`bg-[#0f172a] text-slate-300 h-screen flex flex-col shadow-2xl transition-all duration-300 ease-in-out border-r border-slate-800 fixed left-0 top-0 z-50 ${isOpen ? 'w-64' : 'w-20'}`}>
+      {/* Brand Header */}
+      <div className={`h-20 flex items-center ${isOpen ? 'px-6' : 'justify-center'} border-b border-slate-800/50 bg-[#1e293b]/30 flex-shrink-0`}>
+        {isOpen ? (
+          <div className="flex items-center space-x-3 overflow-hidden">
+            <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-500/20 flex-shrink-0">
+              <FaBed className="text-xl" />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-white font-bold text-lg tracking-tight leading-tight uppercase">Hostel</span>
+              <span className="text-indigo-400 text-[10px] uppercase font-bold tracking-widest leading-none">Management</span>
+            </div>
+          </div>
+        ) : (
+          <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-500/20">
+            <FaBed className="text-xl" />
+          </div>
+        )}
       </div>
-      
-      <nav className="mt-4 flex-1 pb-20">
+
+      {/* Navigation Area */}
+      <nav className="flex-1 px-3 py-6 overflow-y-auto custom-scrollbar space-y-1.5">
+        {/* Main Menu Label */}
+        {isOpen && <p className="px-4 text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-2">Main Menu</p>}
+
         {menuItems.map((item, index) => (
           <div
             key={index}
             onClick={() => setCurrentPage(item.page)}
-            className={`flex items-center px-4 py-3 hover:bg-gray-800 cursor-pointer transition-colors ${
-              currentPage === item.page ? 'bg-blue-600 border-r-4 border-blue-400' : ''
-            }`}
+            className={`flex items-center ${isOpen ? 'px-4' : 'justify-center'} py-3 rounded-xl transition-all duration-200 group cursor-pointer ${currentPage === item.page
+                ? 'bg-indigo-600/10 text-indigo-400 border-l-4 border-indigo-600'
+                : 'hover:bg-slate-800/50 hover:text-white border-l-4 border-transparent'
+              }`}
+            title={!isOpen ? item.label : ''}
           >
-            <item.icon className="text-xl" />
-            <span className={`ml-4 ${isOpen ? 'block' : 'hidden'}`}>
-              {item.label}
-            </span>
+            <item.icon className={`text-lg flex-shrink-0 transition-transform duration-200 group-hover:scale-110 ${isOpen ? 'mr-4' : ''}`} />
+            {isOpen && <span className="font-semibold text-[14px]">{item.label}</span>}
           </div>
         ))}
-        
-        {/* Mess Management Dropdown */}
-        <div>
+
+        {/* Mess Section Label */}
+        <div className="pt-4">
+          {isOpen && <p className="px-4 text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-2">Dining Services</p>}
           <div
-            onClick={() => setMessDropdownOpen(!messDropdownOpen)}
-            className={`flex items-center justify-between px-4 py-3 hover:bg-gray-800 cursor-pointer transition-colors ${
-              currentPage.includes('mess') || currentPage === 'menuManagement' || currentPage === 'messAttendance' || currentPage === 'complaintsManagement' ? 'bg-blue-600 border-r-4 border-blue-400' : ''
-            }`}
+            onClick={() => {
+              if (!isOpen) setCurrentPage('menuManagement');
+              setMessDropdownOpen(!messDropdownOpen);
+            }}
+            className={`flex items-center justify-between ${isOpen ? 'px-4' : 'justify-center'} py-3 rounded-xl transition-all duration-200 group cursor-pointer ${(currentPage.includes('mess') || currentPage === 'menuManagement' || currentPage === 'complaintsManagement' || currentPage === 'messAttendance')
+                ? 'bg-indigo-600/10 text-indigo-400 border-l-4 border-indigo-600'
+                : 'hover:bg-slate-800/50 hover:text-white border-l-4 border-transparent'
+              }`}
           >
             <div className="flex items-center">
-              <FaUtensils className="text-xl" />
-              <span className={`ml-4 ${isOpen ? 'block' : 'hidden'}`}>
-                Mess Management
-              </span>
+              <FaUtensils className={`text-lg flex-shrink-0 group-hover:scale-110 duration-200 ${isOpen ? 'mr-4' : ''}`} />
+              {isOpen && <span className="font-semibold text-[14px]">Mess Admin</span>}
             </div>
             {isOpen && (
-              messDropdownOpen ? 
-                <FaChevronDown className="text-sm" /> : 
-                <FaChevronRight className="text-sm" />
+              messDropdownOpen ? <FaChevronDown className="text-[10px]" /> : <FaChevronRight className="text-[10px]" />
             )}
           </div>
-          
+
           {messDropdownOpen && isOpen && (
-            <div className="bg-gray-800">
+            <div className="mt-1 ml-4 space-y-1 border-l border-slate-800/50 pl-2">
               {messSubItems.map((subItem, index) => (
                 <div
                   key={index}
                   onClick={() => setCurrentPage(subItem.page)}
-                  className="flex items-center px-8 py-2 hover:bg-gray-700 cursor-pointer transition-colors text-sm"
+                  className={`flex items-center px-4 py-2.5 rounded-lg transition-all duration-200 cursor-pointer text-[13px] ${currentPage === subItem.page
+                      ? 'text-indigo-400 font-bold bg-indigo-600/5'
+                      : 'text-slate-400 hover:text-white hover:bg-slate-800/30'
+                    }`}
                 >
-                  <subItem.icon className="text-base mr-3" />
+                  <subItem.icon className="mr-3 text-[12px]" />
                   {subItem.label}
                 </div>
               ))}
             </div>
           )}
         </div>
-        
-        <div
-          onClick={handleLogout}
-          className="flex items-center px-4 py-3 hover:bg-red-600 cursor-pointer transition-colors mt-4 flex-shrink-0"
-        >
-          <FaSignOutAlt className="text-xl" />
-          <span className={`ml-4 ${isOpen ? 'block' : 'hidden'}`}>
-            Logout
-          </span>
-        </div>
       </nav>
+
+      {/* Bottom Profile Area */}
+      <div className="mt-auto p-4 border-t border-slate-800 bg-[#1e293b]/20 flex-shrink-0">
+        <div className="space-y-1">
+          <button
+            onClick={() => setCurrentPage('changePassword')}
+            className={`flex items-center w-full cursor-pointer ${isOpen ? 'px-4' : 'justify-center'} py-3 text-slate-400 hover:bg-slate-800 hover:text-white rounded-xl transition-all duration-200 group`}
+            title={!isOpen ? 'Security Settings' : ''}
+          >
+            <FaKey className={`text-lg flex-shrink-0 group-hover:rotate-12 duration-200 ${isOpen ? 'mr-4' : ''}`} />
+            {isOpen && <span className="font-medium text-[14px]">Security</span>}
+          </button>
+
+          <button
+            onClick={handleLogout}
+            className={`flex items-center w-full cursor-pointer ${isOpen ? 'px-4' : 'justify-center'} py-3 text-slate-400 hover:bg-rose-500/10 hover:text-rose-400 rounded-xl transition-all duration-200 group`}
+            title={!isOpen ? 'Sign Out' : ''}
+          >
+            <FaSignOutAlt className={`text-lg flex-shrink-0 group-hover:translate-x-1 duration-200 ${isOpen ? 'mr-4' : ''}`} />
+            {isOpen && <span className="font-medium text-[14px]">Sign Out</span>}
+          </button>
+        </div>
+      </div>
     </div>
   );
 };

@@ -11,7 +11,8 @@ import MessComplaintQR from './MessComplaintQR';
 import CheckInOut from './CheckInOut';
 import StudentQueries from './StudentQueries';
 import ChangePassword from './ChangePassword';
-import { FaUsers, FaBed, FaClipboardCheck, FaUtensils, FaArrowUp, FaClock, FaCheckCircle, FaExclamationTriangle } from 'react-icons/fa';
+import Analytics from './Analytics';
+import { FaUsers, FaBed, FaClipboardCheck, FaUtensils, FaArrowUp, FaClock, FaCheckCircle, FaExclamationTriangle, FaCogs, FaQuestionCircle } from 'react-icons/fa';
 
 const Dashboard = ({ onLogout }) => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -26,217 +27,222 @@ const Dashboard = ({ onLogout }) => {
 
   const DashboardContent = () => {
     const wardenId = localStorage.getItem('wardenId') || 'WRD001';
-    
-    // Initialize default data if not exists
-    if (!localStorage.getItem('students')) {
-      const defaultStudents = [
-        { id: 1, name: 'Rahul Kumar', rollNumber: 'CS001', email: 'rahul@email.com', phone: '9876543210', course: 'B.Tech', year: '2nd', status: 'Active', joinDate: '2024-01-15' },
-        { id: 2, name: 'Priya Sharma', rollNumber: 'CS002', email: 'priya@email.com', phone: '9876543211', course: 'B.Tech', year: '1st', status: 'Active', joinDate: '2024-01-16' },
-        { id: 3, name: 'Amit Singh', rollNumber: 'CS003', email: 'amit@email.com', phone: '9876543212', course: 'MCA', year: '1st', status: 'Active', joinDate: '2024-01-17' }
-      ];
-      localStorage.setItem('students', JSON.stringify(defaultStudents));
-    }
-    
-    if (!localStorage.getItem('roomTypes')) {
-      const defaultRoomTypes = [
-        { id: 1, name: 'Single AC', capacity: 1, monthlyRent: 8000, securityDeposit: 5000, amenities: ['AC', 'WiFi', 'Study Table'], description: 'AC single room' },
-        { id: 2, name: 'Double AC', capacity: 2, monthlyRent: 6000, securityDeposit: 4000, amenities: ['AC', 'WiFi', 'Study Tables'], description: 'AC double sharing' }
-      ];
-      localStorage.setItem('roomTypes', JSON.stringify(defaultRoomTypes));
-    }
-    
-    if (!localStorage.getItem('rooms')) {
-      const roomTypes = JSON.parse(localStorage.getItem('roomTypes'));
-      const defaultRooms = [
-        { id: 1, number: '101', typeId: roomTypes[0].id, floor: 1, capacity: roomTypes[0].capacity, status: 'Available' },
-        { id: 2, number: '102', typeId: roomTypes[1].id, floor: 1, capacity: roomTypes[1].capacity, status: 'Available' },
-        { id: 3, number: '201', typeId: roomTypes[0].id, floor: 2, capacity: roomTypes[0].capacity, status: 'Available' }
-      ];
-      localStorage.setItem('rooms', JSON.stringify(defaultRooms));
-    }
-    
-    if (!localStorage.getItem('roomAllocations')) {
-      const defaultAllocations = [
-        { id: 1, studentId: 1, roomId: 1, studentName: 'Rahul Kumar', roomNumber: '101', allocatedDate: '2024-01-15', status: 'Active' },
-        { id: 2, studentId: 2, roomId: 2, studentName: 'Priya Sharma', roomNumber: '102', allocatedDate: '2024-01-16', status: 'Active' }
-      ];
-      localStorage.setItem('roomAllocations', JSON.stringify(defaultAllocations));
-    }
-    
+
+    // Data fetching (existing logic preserved)
     const students = JSON.parse(localStorage.getItem('students') || '[]');
     const rooms = JSON.parse(localStorage.getItem('rooms') || '[]');
     const allocations = JSON.parse(localStorage.getItem('roomAllocations') || '[]');
     const queries = JSON.parse(localStorage.getItem('studentQueries') || '[]');
-    
+
     const stats = [
-      { icon: FaUsers, label: 'Total Students', value: students.length.toString(), change: '+2', color: 'from-blue-500 to-blue-600', bgColor: 'bg-blue-50' },
-      { icon: FaBed, label: 'Total Rooms', value: rooms.length.toString(), change: '+5', color: 'from-green-500 to-green-600', bgColor: 'bg-green-50' },
-      { icon: FaClipboardCheck, label: 'Allocated Rooms', value: allocations.length.toString(), change: '+3', color: 'from-purple-500 to-purple-600', bgColor: 'bg-purple-50' },
-      { icon: FaUtensils, label: 'Mess Registered', value: JSON.parse(localStorage.getItem('messRegistrations') || '[]').length.toString(), change: '+1', color: 'from-orange-500 to-orange-600', bgColor: 'bg-orange-50' },
+      { icon: FaUsers, label: 'Resident Students', value: students.length.toString(), change: '+2', trend: 'up', color: 'indigo' },
+      { icon: FaBed, label: 'Total Capacity', value: rooms.length.toString(), change: '+5', trend: 'up', color: 'blue' },
+      { icon: FaClipboardCheck, label: 'Active Allotments', value: allocations.length.toString(), change: '+12%', trend: 'up', color: 'emerald' },
+      { icon: FaUtensils, label: 'Mess Registered', value: JSON.parse(localStorage.getItem('messRegistrations') || '[]').length.toString(), change: '+1', trend: 'up', color: 'rose' },
     ];
 
     return (
-      <main className="p-6">
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">Warden Dashboard</h2>
-          <p className="text-gray-600 mt-2">Welcome back, {wardenId}! Here's your hostel overview.</p>
+      <div className="animate-in space-y-8">
+        {/* Welcome Header */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">Hostel Overview</h2>
+            <p className="text-slate-500 font-medium">Monitoring system active for <span className="text-indigo-600 font-bold">{wardenId}</span></p>
+          </div>
+          <div className="flex items-center gap-2 bg-white p-1.5 rounded-2xl shadow-sm border border-slate-200">
+            <button className="px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition-all">Today's Report</button>
+            <button
+              onClick={() => handlePageChange('analytics')}
+              className="px-4 py-2 text-slate-600 rounded-xl text-sm font-bold hover:bg-slate-50 transition-all cursor-pointer"
+            >
+              Analytics
+            </button>
+          </div>
         </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {stats.map((stat, index) => (
-            <div key={index} className={`${stat.bgColor} rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 p-6 border border-white/50`}>
-              <div className="flex items-center justify-between">
-                <div className={`bg-gradient-to-r ${stat.color} p-4 rounded-xl shadow-lg`}>
-                  <stat.icon className="text-white text-2xl" />
+            <div key={index} className="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-indigo-500/5 transition-all group card-hover">
+              <div className="flex items-start justify-between">
+                <div className={`p-4 rounded-2xl bg-${stat.color}-50 text-${stat.color}-600 group-hover:scale-110 transition-transform duration-300`}>
+                  <stat.icon className="text-2xl" />
                 </div>
-                <div className="flex items-center text-green-600 text-sm font-semibold">
-                  <FaArrowUp className="mr-1" />
-                  {stat.change}
-                </div>
+                <span className={`flex items-center text-[11px] font-bold px-2 py-1 rounded-lg bg-emerald-50 text-emerald-600`}>
+                  <FaArrowUp className="mr-1 text-[8px]" /> {stat.change}
+                </span>
               </div>
-              <div className="mt-4">
-                <p className="text-gray-600 text-sm font-medium">{stat.label}</p>
-                <p className="text-3xl font-bold text-gray-800 mt-1">{stat.value}</p>
+              <div className="mt-6">
+                <p className="text-3xl font-black text-slate-900 leading-none">{stat.value}</p>
+                <p className="text-slate-400 text-xs font-bold uppercase tracking-wider mt-2">{stat.label}</p>
               </div>
             </div>
           ))}
         </div>
 
-         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl shadow-xl p-6 text-white">
-            <h4 className="text-lg font-bold mb-2">Today's Check-ins</h4>
-            <p className="text-3xl font-bold">{JSON.parse(localStorage.getItem('checkInOutRecords') || '[]').filter(r => r.date === new Date().toISOString().split('T')[0] && r.action === 'checkin').length}</p>
-            <p className="text-indigo-200 text-sm">Students checked in today</p>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Main Activity Column */}
+          <div className="lg:col-span-2 space-y-8">
+            {/* Live Status Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="bg-gradient-to-br from-indigo-600 to-blue-700 rounded-3xl p-6 text-white shadow-xl shadow-indigo-200 relative overflow-hidden group">
+                <div className="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-125 transition-transform duration-500">
+                  <FaUsers size={120} />
+                </div>
+                <h4 className="text-indigo-100 text-xs font-black uppercase tracking-widest mb-4">Daily Check-ins</h4>
+                <p className="text-4xl font-black mb-1">
+                  {JSON.parse(localStorage.getItem('checkInOutRecords') || '[]').filter(r => r.date === new Date().toISOString().split('T')[0] && r.action === 'checkin').length}
+                </p>
+                <span className="text-[10px] font-bold bg-white/20 px-2 py-0.5 rounded-full">LIVE UPDATES</span>
+              </div>
+
+              <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-3xl p-6 text-white shadow-xl shadow-slate-200 relative overflow-hidden group border border-slate-700">
+                <div className="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-125 transition-transform duration-500">
+                  <FaClipboardCheck size={120} />
+                </div>
+                <h4 className="text-slate-400 text-xs font-black uppercase tracking-widest mb-4">Attendance Rank</h4>
+                <p className="text-4xl font-black mb-1">94%</p>
+                <span className="text-[10px] font-bold bg-white/10 px-2 py-0.5 rounded-full text-slate-300">High Attendance</span>
+              </div>
+
+              <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm overflow-hidden relative group">
+                <h4 className="text-slate-400 text-xs font-black uppercase tracking-widest mb-4">Room Occupancy</h4>
+                <div className="flex items-end gap-2">
+                  <p className="text-4xl font-black text-slate-900">
+                    {rooms.length > 0 ? Math.round((allocations.length / rooms.length) * 100) : 0}%
+                  </p>
+                </div>
+                <div className="mt-4 w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                  <div
+                    className="bg-indigo-600 h-full rounded-full transition-all duration-1000"
+                    style={{ width: `${rooms.length > 0 ? (allocations.length / rooms.length) * 100 : 0}%` }}
+                  ></div>
+                </div>
+              </div>
+            </div>
+
+            {/* Recent Logs Table/List */}
+            <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+              <div className="p-6 border-b border-slate-50 flex items-center justify-between bg-slate-50/50">
+                <h3 className="font-black text-slate-800 tracking-tight flex items-center">
+                  <span className="w-2 h-2 bg-indigo-600 rounded-full mr-3 animate-pulse"></span>
+                  Activity Logs
+                </h3>
+                <button className="text-indigo-600 text-xs font-bold hover:underline">View All</button>
+              </div>
+              <div className="p-2">
+                {[
+                  { title: 'New Allotment', desc: allocations.length > 0 ? `${allocations[allocations.length - 1].studentName} coded to ${allocations[allocations.length - 1].roomNumber}` : 'Syncing...', time: '2m ago', icon: FaCheckCircle, color: 'emerald' },
+                  { title: 'Maintenance Update', desc: `Room ${rooms.length > 0 ? rooms[rooms.length - 1].number : 'NA'} inspection completed`, time: '45m ago', icon: FaCogs, color: 'blue' },
+                  { title: 'Student Queries', desc: `${queries.length} requests awaiting warden approval`, time: '1h ago', icon: FaExclamationTriangle, color: 'rose' },
+                ].map((item, i) => (
+                  <div key={i} className="flex items-center p-4 hover:bg-slate-50 rounded-2xl transition-all group cursor-pointer">
+                    <div className={`w-12 h-12 rounded-xl bg-${item.color}-50 text-${item.color}-500 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform`}>
+                      <item.icon className="text-lg" />
+                    </div>
+                    <div className="ml-4 flex-1">
+                      <p className="text-sm font-bold text-slate-900">{item.title}</p>
+                      <p className="text-xs text-slate-500 font-medium truncate max-w-[200px]">{item.desc}</p>
+                    </div>
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{item.time}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
-          <div className="bg-gradient-to-br from-pink-500 to-rose-600 rounded-2xl shadow-xl p-6 text-white">
-            <h4 className="text-lg font-bold mb-2">Present Today</h4>
-            <p className="text-3xl font-bold">{(() => {
-              const today = new Date().toISOString().split('T')[0];
-              const morningAttendance = JSON.parse(localStorage.getItem(`attendance_${today}_morning`) || '{}');
-              return Object.values(morningAttendance).filter(status => status === 'present').length;
-            })()}</p>
-            <p className="text-pink-200 text-sm">Morning attendance</p>
-          </div>
-          <div className="bg-gradient-to-br from-teal-500 to-cyan-600 rounded-2xl shadow-xl p-6 text-white">
-            <h4 className="text-lg font-bold mb-2">Room Occupancy</h4>
-            <p className="text-3xl font-bold">{rooms.length > 0 ? Math.round((allocations.length / rooms.length) * 100) : 0}%</p>
-            <p className="text-teal-200 text-sm">Current occupancy rate</p>
+
+          {/* Quick Actions Sidebar */}
+          <div className="space-y-6">
+            <div className="bg-[#0f172a] rounded-3xl p-8 text-white shadow-2xl relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-4 opacity-10">
+                <FaCogs size={80} />
+              </div>
+              <h3 className="text-xl font-black mb-2">Smart Actions</h3>
+              <p className="text-slate-400 text-xs font-medium mb-8">Execute administrative tasks instantly</p>
+
+              <div className="grid grid-cols-1 gap-3">
+                {[
+                  { label: 'Room Audit', icon: FaBed, page: 'roomManagement', color: 'indigo' },
+                  { label: 'Mark Attendance', icon: FaClipboardCheck, page: 'attendance', color: 'emerald' },
+                  { label: 'Mess Control', icon: FaUtensils, page: 'messManagement', color: 'rose' },
+                  { label: 'All Queries', icon: FaQuestionCircle, page: 'studentQueries', color: 'amber' },
+                ].map((act, i) => (
+                  <button
+                    key={i}
+                    onClick={() => handlePageChange(act.page)}
+                    className="flex items-center justify-between w-full bg-slate-800/50 hover:bg-white hover:text-slate-900 p-4 rounded-2xl transition-all group border border-slate-700/50 hover:border-white shadow-lg"
+                  >
+                    <span className="font-bold text-sm tracking-tight">{act.label}</span>
+                    <act.icon className="text-slate-500 group-hover:text-indigo-600 transition-colors" />
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
+              <div className="flex items-center justify-between mb-4">
+                <h4 className="font-black text-slate-800 text-sm">Mess Complaints</h4>
+                <div className="w-8 h-8 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center font-bold text-xs">{queries.length}</div>
+              </div>
+              <p className="text-slate-500 text-[11px] leading-relaxed mb-6 font-medium">New complaints registered via QR system. Review and take action to maintain mess quality standards.</p>
+              <button
+                onClick={() => handlePageChange('complaintsManagement')}
+                className="w-full py-3 bg-slate-50 hover:bg-slate-100 text-slate-900 rounded-xl text-xs font-black uppercase tracking-widest transition-all"
+              >
+                Review Complaints
+              </button>
+            </div>
           </div>
         </div>
-        <br />
-        
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-          <div className="lg:col-span-2 bg-white/70 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-white/50">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold text-gray-800">Recent Activities</h3>
-              <FaClock className="text-gray-400" />
-            </div>
-            <div className="space-y-4">
-              <div className="flex items-center p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border-l-4 border-green-500">
-                <FaCheckCircle className="text-green-500 text-lg mr-4" />
-                <div>
-                  <p className="text-gray-800 font-medium">{allocations.length > 0 ? `${allocations[allocations.length-1].studentName} allocated to Room ${allocations[allocations.length-1].roomNumber}` : 'No recent allocations'}</p>
-                  <p className="text-gray-500 text-sm">Recent activity</p>
-                </div>
-              </div>
-              <div className="flex items-center p-4 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl border-l-4 border-blue-500">
-                <FaCheckCircle className="text-blue-500 text-lg mr-4" />
-                <div>
-                  <p className="text-gray-800 font-medium">Room {rooms.length > 0 ? rooms[rooms.length-1].number : 'N/A'} status updated</p>
-                  <p className="text-gray-500 text-sm">Room management</p>
-                </div>
-              </div>
-              <div className="flex items-center p-4 bg-gradient-to-r from-orange-50 to-amber-50 rounded-xl border-l-4 border-orange-500">
-                <FaExclamationTriangle className="text-orange-500 text-lg mr-4" />
-                <div>
-                  <p className="text-gray-800 font-medium">{queries.length} student queries pending</p>
-                  <p className="text-gray-500 text-sm">Requires attention</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-white/50">
-            <h3 className="text-xl font-bold text-gray-800 mb-6">Quick Actions</h3>
-            <div className="space-y-4">
-              <button 
-                onClick={() => handlePageChange('roomManagement')}
-                className="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white p-4 rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg font-medium"
-              >
-                Manage Rooms
-              </button>
-              <button 
-                onClick={() => handlePageChange('attendance')}
-                className="w-full bg-gradient-to-r from-green-500 to-green-600 text-white p-4 rounded-xl hover:from-green-600 hover:to-green-700 transition-all duration-300 transform hover:scale-105 shadow-lg font-medium"
-              >
-                Take Attendance
-              </button>
-              <button 
-                onClick={() => handlePageChange('messManagement')}
-                className="w-full bg-gradient-to-r from-purple-500 to-purple-600 text-white p-4 rounded-xl hover:from-purple-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg font-medium"
-              >
-                Mess Management
-              </button>
-              <button 
-                onClick={() => handlePageChange('studentQueries')}
-                className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white p-4 rounded-xl hover:from-orange-600 hover:to-orange-700 transition-all duration-300 transform hover:scale-105 shadow-lg font-medium"
-              >
-                View Queries
-              </button>
-            </div>
-          </div>
-        </div>
-        
-       
-      </main>
+      </div>
     );
   };
 
   const renderPage = () => {
-    switch(currentPage) {
-      case 'roomManagement':
-        return <RoomManagement />;
-      case 'attendance':
-        return <Attendance />;
-      case 'messManagement':
-        return <MessManagement />;
-      case 'menuManagement':
-        return <MenuManagement />;
-      case 'messAttendance':
-        return <MessAttendance />;
-      case 'complaintsManagement':
-        return <ComplaintsManagement />;
-      case 'messComplaintQR':
-        return <MessComplaintQR />;
-      case 'checkInOut':
-        return <CheckInOut />;
-      case 'studentQueries':
-        return <StudentQueries />;
-      case 'changePassword':
-        return <ChangePassword onNavigate={setCurrentPage} />;
+    switch (currentPage) {
+      case 'roomManagement': return <RoomManagement />;
+      case 'attendance': return <Attendance />;
+      case 'messManagement': return <MessManagement />;
+      case 'menuManagement': return <MenuManagement />;
+      case 'messAttendance': return <MessAttendance />;
+      case 'complaintsManagement': return <ComplaintsManagement />;
+      case 'messComplaintQR': return <MessComplaintQR />;
+      case 'checkInOut': return <CheckInOut />;
+      case 'studentQueries': return <StudentQueries />;
+      case 'changePassword': return <ChangePassword onNavigate={setCurrentPage} />;
+      case 'analytics': return <Analytics onBack={() => handlePageChange('dashboard')} />;
       case 'dashboard':
-      default:
-        return <DashboardContent />;
+      default: return <DashboardContent />;
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-100">
-      <Sidebar 
-        isOpen={sidebarOpen} 
-        onLogout={onLogout}
-        currentPage={currentPage}
-        setCurrentPage={handlePageChange}
-      />
-      
-      <div className={`transition-all duration-300 ${sidebarOpen ? 'ml-64' : 'ml-16'} pt-20`}>
-        <Navbar 
-          sidebarOpen={sidebarOpen} 
+    <div className="flex h-screen bg-slate-50 overflow-hidden font-sans">
+      {/* Sidebar - Fixed Width */}
+      <div className={`flex-shrink-0 transition-all duration-300 ${sidebarOpen ? 'w-64' : 'w-20'}`}>
+        <Sidebar
+          isOpen={sidebarOpen}
+          onLogout={onLogout}
+          currentPage={currentPage}
+          setCurrentPage={handlePageChange}
+        />
+      </div>
+
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        {/* Navbar */}
+        <Navbar
+          sidebarOpen={sidebarOpen}
           toggleSidebar={() => setSidebarOpen(!sidebarOpen)}
           role="Warden"
         />
-        
-        {renderPage()}
+
+        {/* Page Content - Independent Scroll */}
+        <main className="flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-8 custom-scrollbar bg-slate-50">
+          <div className="max-w-7xl mx-auto pb-10">
+            {renderPage()}
+          </div>
+        </main>
       </div>
     </div>
   );

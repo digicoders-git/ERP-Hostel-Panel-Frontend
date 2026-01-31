@@ -1,26 +1,60 @@
 @import 'tailwindcss';
 
-/* Hide scrollbar */
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+@layer base {
+  body {
+    @apply overflow-hidden bg-slate-50 text-slate-900;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
 }
 
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
+@layer utilities {
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-slate-200 rounded-full;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    @apply bg-slate-300;
+  }
+
+  /* For Firefox */
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: #e2e8f0 transparent;
+  }
 }
 
-/* Chrome, Edge, Safari */
-::-webkit-scrollbar {
-  display: none;
+/* Glassmorphism utility */
+.glass {
+  @apply bg-white/70 backdrop-blur-md border border-white/20 shadow-xl;
 }
 
-/* Firefox */
-html {
-  scrollbar-width: none;
+/* Page transitions */
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
-/* IE / Old Edge */
-body {
-  -ms-overflow-style: none;
+.animate-in {
+  animation: fadeInScale 0.4s ease-out forwards;
+}
+
+/* Card Hover Effects */
+.card-hover {
+  @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-indigo-500/10;
 }
