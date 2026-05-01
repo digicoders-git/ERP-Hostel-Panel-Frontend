@@ -93,6 +93,7 @@ const Sidebar = ({ isOpen, onLogout }) => {
       <nav className="flex-1 px-3 py-6 overflow-y-auto custom-scrollbar">
         <NavItem icon={FaTachometerAlt} label="Main Dashboard" path="/" />
         <NavItem icon={FaUser} label="My Profile" path="/profile" />
+        <NavItem icon={FaClipboardCheck} label="My Attendance" path="/my-attendance" />
         
         <SectionLabel label="Hostel Admission" />
         <NavItem icon={FaCogs} label="Rooms List" path="/manage-rooms" />

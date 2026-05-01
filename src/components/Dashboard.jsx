@@ -24,6 +24,7 @@ import ServicesManagement from './ServicesManagement';
 import VisitorManagement from './VisitorManagement';
 import LeaveGatePassManagement from './LeaveGatePassManagement';
 import Profile from './Profile';
+import PersonalAttendanceHistory from './PersonalAttendanceHistory';
 import { FaUsers, FaBed, FaClipboardCheck, FaUtensils, FaArrowUp, FaClock, FaCheckCircle, FaExclamationTriangle, FaCogs, FaQuestionCircle, FaMoneyBillWave, FaUserTie } from 'react-icons/fa';
 
 const Dashboard = ({ onLogout }) => {
@@ -300,6 +301,7 @@ const Dashboard = ({ onLogout }) => {
               <Route path="/services" element={<ServicesManagement />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/reports" element={<Analytics onBack={() => navigate('/')} />} />
+              <Route path="/my-attendance" element={<PersonalAttendanceHistory />} />
               <Route path="/security" element={<ChangePassword onNavigate={(path) => navigate(path)} />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
