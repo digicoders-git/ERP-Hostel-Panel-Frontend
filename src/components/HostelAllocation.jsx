@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { FaClipboardList, FaPlus, FaEdit, FaTrash, FaUser, FaBed, FaCalendar, FaSearch, FaFilter } from 'react-icons/fa';
-import { hostelAllocationAPI, hostelAPI, hostelStudentAPI, roomTypeAPI, roomAPI } from '../services/api';
+import { hostelAllocationAPI, hostelAPI, roomTypeAPI, roomAPI } from '../services/api';
 import Swal from 'sweetalert2';
 
 const HostelAllocation = ({ onNavigate }) => {
   const [allocations, setAllocations] = useState([]);
   const [hostels, setHostels] = useState([]);
-  const [students, setStudents] = useState([]);
+  const [allocatedStudents, setAllocatedStudents] = useState([]);
   const [roomTypes, setRoomTypes] = useState([]);
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -15,6 +15,7 @@ const HostelAllocation = ({ onNavigate }) => {
   const [editingId, setEditingId] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
+  const [studentSearch, setStudentSearch] = useState('');
   const [formData, setFormData] = useState({
     studentId: '',
     studentName: '',
@@ -31,43 +32,51 @@ const HostelAllocation = ({ onNavigate }) => {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    if (showForm) {
+      fetchAllocatedStudents(studentSearch);
+    }
+  }, [studentSearch, showForm]);
+
+  const fetchAllocatedStudents = async (search = '') => {
+    try {
+      const res = await hostelAllocationAPI.getAllocatedStudents({ search });
+      setAllocatedStudents(res.data.data || []);
+    } catch (error) {
+      console.error('Failed to fetch allocated students:', error);
+    }
+  };
+
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [allocationsRes, hostelsRes, studentsRes, roomTypesRes, roomsRes] = await Promise.all([
+      const [allocationsRes, hostelsRes, roomTypesRes, roomsRes] = await Promise.all([
         hostelAllocationAPI.getAll().catch(err => ({ data: { allocations: [] } })),
         hostelAPI.getAll().catch(err => ({ data: { hostels: [] } })),
-        hostelStudentAPI.getAll({ status: 'Active' }).catch(err => ({ data: { data: [] } })),
         roomTypeAPI.getAll().catch(err => ({ data: { roomTypes: [] } })),
         roomAPI.getAll().catch(err => ({ data: { rooms: [] } }))
       ]);
       
-      // Extract data from correct response structure
       const allocationsData = allocationsRes.data.allocations || [];
       const hostelsData = hostelsRes.data.hostels || [];
-      const studentsData = studentsRes.data.data || [];
       const roomTypesData = roomTypesRes.data.roomTypes || [];
       const roomsData = roomsRes.data.rooms || [];
       
       console.log('=== DATA FETCHED ===');
       console.log('Allocations:', allocationsData.length);
       console.log('Hostels:', hostelsData.length, hostelsData);
-      console.log('Students:', studentsData.length, studentsData);
       console.log('Room Types:', roomTypesData.length, roomTypesData);
       console.log('Rooms:', roomsData.length, roomsData);
       
       setAllocations(allocationsData);
       setHostels(hostelsData);
-      setStudents(studentsData);
       setRoomTypes(roomTypesData);
       setRooms(roomsData);
       
       if (hostelsData.length === 0) {
         toast.error('No hostels found! Please create hostels first.');
-      } else if (studentsData.length === 0) {
-        toast.error('No students found! Please add students first.');
       } else {
-        toast.success(`Loaded: ${hostelsData.length} hostels, ${studentsData.length} students, ${roomsData.length} rooms`);
+        toast.success(`Loaded: ${hostelsData.length} hostels, ${roomsData.length} rooms`);
       }
     } catch (error) {
       toast.error('Failed to load data');
@@ -80,17 +89,17 @@ const HostelAllocation = ({ onNavigate }) => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
 
-    // Auto-fill student name when student is selected
-    if (name === 'studentId') {
-      const student = students.find(s => s._id === value);
-      if (student) {
-        setFormData(prev => ({
-          ...prev,
-          studentName: student.name,
-          phone: student.phone || ''
-        }));
-      }
+  const handleStudentSelect = (studentId) => {
+    const student = allocatedStudents.find(s => s._id === studentId);
+    if (student) {
+      setFormData(prev => ({
+        ...prev,
+        studentId: student._id,
+        studentName: student.studentName
+      }));
+      setStudentSearch('');
     }
   };
 
@@ -142,6 +151,7 @@ const HostelAllocation = ({ onNavigate }) => {
       securityDeposit: '',
       remark: ''
     });
+    setStudentSearch('');
     setShowForm(false);
     setEditingId(null);
   };
@@ -214,7 +224,6 @@ const HostelAllocation = ({ onNavigate }) => {
     }
   };
 
-  // Get available rooms for selected hostel
   const availableRooms = rooms.filter(room => 
     formData.hostelId ? String(room.hostel?._id) === String(formData.hostelId) : false
   );
@@ -374,7 +383,7 @@ const HostelAllocation = ({ onNavigate }) => {
                   {editingId ? 'Edit Allocation' : 'New Room Allocation'}
                 </h2>
                 <p className="text-emerald-100 text-sm mt-1">
-                  📊 Available: {hostels.length} hostels | {students.length} students | {rooms.length} rooms | {roomTypes.length} room types
+                  📊 Available: {hostels.length} hostels | {allocatedStudents.length} allocated students | {rooms.length} rooms | {roomTypes.length} room types
                 </p>
               </div>
 
@@ -384,23 +393,39 @@ const HostelAllocation = ({ onNavigate }) => {
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
                       Select Student <span className="text-red-500">*</span>
                     </label>
-                    <select
-                      name="studentId"
-                      value={formData.studentId}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition"
-                      required
-                      disabled={editingId}
-                    >
-                      <option value="">-- Select Student --</option>
-                      {students.map(student => (
-                        <option key={student._id} value={student._id}>
-                          {student.name} - {student.rollNumber} ({student.course})
-                        </option>
-                      ))}
-                    </select>
-                    {students.length === 0 && (
-                      <p className="text-xs text-red-500 mt-1">⚠️ No students available</p>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        placeholder="Search allocated students..."
+                        value={studentSearch}
+                        onChange={(e) => setStudentSearch(e.target.value)}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition"
+                      />
+                      {studentSearch && allocatedStudents.length > 0 && (
+                        <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-10 max-h-48 overflow-y-auto">
+                          {allocatedStudents.map(student => (
+                            <button
+                              key={student._id}
+                              type="button"
+                              onClick={() => handleStudentSelect(student._id)}
+                              className="w-full text-left px-4 py-2 hover:bg-emerald-50 border-b border-gray-100 last:border-b-0"
+                            >
+                              <div className="font-semibold text-gray-800">{student.studentName}</div>
+                              <div className="text-xs text-gray-600">{student.studentId}</div>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                      {studentSearch && allocatedStudents.length === 0 && (
+                        <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-10 p-3 text-center text-gray-500 text-sm">
+                          No allocated students found
+                        </div>
+                      )}
+                    </div>
+                    {formData.studentId && (
+                      <div className="mt-2 p-2 bg-emerald-50 rounded-lg border border-emerald-200">
+                        <p className="text-sm text-emerald-800">✓ Selected: <strong>{formData.studentName}</strong></p>
+                      </div>
                     )}
                   </div>
 

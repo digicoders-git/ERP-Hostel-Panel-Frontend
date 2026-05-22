@@ -105,3 +105,30 @@
   opacity: 1;
   transform: translateX(-50%) scale(1);
 }
+
+
+/* React Select Styling */
+.react-select-container .react-select__control {
+  @apply border-gray-200 rounded-xl focus-within:ring-2 focus-within:ring-emerald-500 focus-within:border-transparent;
+  min-height: 44px;
+}
+
+.react-select-container .react-select__control:hover {
+  @apply border-gray-300;
+}
+
+.react-select-container .react-select__menu {
+  @apply rounded-xl shadow-lg border border-gray-200;
+}
+
+.react-select-container .react-select__option--is-selected {
+  @apply bg-emerald-500;
+}
+
+.react-select-container .react-select__option--is-focused {
+  @apply bg-emerald-100;
+}
+
+.react-select-container .react-select__input-container {
+  @apply text-sm;
+}

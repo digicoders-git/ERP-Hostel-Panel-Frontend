@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { 
   FaMoneyBillWave, FaUtensils, FaBed, FaFilter, FaSearch, 
   FaCheckCircle, FaTimesCircle, FaClock, FaMagic, FaDownload, 
-  FaPlus, FaChevronRight, FaCalendarAlt, FaReceipt, FaExclamationTriangle
+  FaPlus, FaChevronRight, FaCalendarAlt, FaReceipt, FaExclamationTriangle, FaSpinner
 } from 'react-icons/fa';
 import Swal from 'sweetalert2';
 import { hostelFeeAPI, hostelStudentAPI } from '../services/api';

@@ -26,17 +26,52 @@ const BedAllocation = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [roomsRes, studentsRes, allocationsRes] = await Promise.all([
-        roomAPI.getAll(),
-        hostelStudentAPI.getAll({ status: 'Active' }),
-        bedAllocationAPI.getAll({ status: 'active' })
-      ]);
-      setRooms(roomsRes.data.data || []);
-      setStudents(studentsRes.data.data || []);
-      setBedAllocations(allocationsRes.data.data || []);
+      console.log('Fetching bed allocation data...');
+      
+      // Try API first, fallback to localStorage
+      let roomsData = [];
+      let studentsData = [];
+      let allocationsData = [];
+      
+      try {
+        const roomsRes = await roomAPI.getAll();
+        roomsData = roomsRes.data.data || roomsRes.data.rooms || [];
+      } catch (err) {
+        console.warn('Rooms API failed, using localStorage');
+        roomsData = JSON.parse(localStorage.getItem('rooms') || '[]');
+      }
+      
+      try {
+        const studentsRes = await hostelStudentAPI.getAll({ status: 'Active' });
+        studentsData = studentsRes.data.data || [];
+      } catch (err) {
+        console.warn('Students API failed, using localStorage');
+        studentsData = JSON.parse(localStorage.getItem('students') || '[]');
+      }
+      
+      try {
+        const allocationsRes = await bedAllocationAPI.getAll({ status: 'active' });
+        allocationsData = allocationsRes.data.data || [];
+      } catch (err) {
+        console.warn('Allocations API failed, using localStorage');
+        allocationsData = JSON.parse(localStorage.getItem('bedAllocations') || '[]');
+      }
+      
+      console.log('Fetched data:', { rooms: roomsData.length, students: studentsData.length, allocations: allocationsData.length });
+      console.log('Students data:', studentsData);
+      
+      setRooms(roomsData);
+      setStudents(studentsData);
+      setBedAllocations(allocationsData);
+      
+      if (studentsData.length === 0) {
+        toast.error('No students found in database');
+      } else {
+        toast.success(`Loaded ${studentsData.length} students`);
+      }
     } catch (error) {
+      console.error('Fetch error:', error);
       toast.error('Failed to load data');
-      console.error(error);
     } finally {
       setLoading(false);
     }
@@ -96,10 +131,11 @@ const BedAllocation = () => {
   };
 
   const handleBedClick = async (bed) => {
+    console.log('Bed clicked:', bed);
+    console.log('Available students:', availableStudents);
     if (bed.allocation) {
       let student = getStudentById(bed.allocation.studentId);
       
-      // If student not in local state, fetch from backend
       if (!student) {
         const loadToast = toast.loading('Fetching student profile...');
         try {
@@ -120,6 +156,7 @@ const BedAllocation = () => {
         toast.error('Student details not found');
       }
     } else {
+      console.log('Opening allocation modal for bed:', bed);
       setSelectedBed(bed);
       setShowAllocationModal(true);
     }
@@ -176,7 +213,8 @@ const BedAllocation = () => {
       String(alloc.studentId) === studentId && alloc.status !== 'deallocated'
     );
     const matchesSearch = student.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         student.rollNumber?.toLowerCase().includes(searchTerm.toLowerCase());
+                         student.rollNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         student.course?.toLowerCase().includes(searchTerm.toLowerCase());
     return !isAllocated && matchesSearch;
   });
 
@@ -453,7 +491,11 @@ const BedAllocation = () => {
                     type="text"
                     placeholder="Search students by name or roll number..."
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onChange={(e) => {
+                      console.log('Search term:', e.target.value);
+                      console.log('Available students:', availableStudents);
+                      setSearchTerm(e.target.value);
+                    }}
                     className="w-full pl-16 pr-6 py-5 bg-slate-50 border-none rounded-[1.5rem] text-sm font-bold text-slate-800 focus:ring-2 focus:ring-slate-900 outline-none transition-all"
                   />
                 </div>
@@ -463,22 +505,22 @@ const BedAllocation = () => {
                 {availableStudents.length > 0 ? (
                   availableStudents.map((student) => (
                     <div
-                      key={student._id}
-                      onClick={() => !isSubmitting && handleAllocateBed(student._id)}
+                      key={student._id || student.id}
+                      onClick={() => !isSubmitting && handleAllocateBed(student._id || student.id)}
                       className={`flex items-center justify-between p-5 bg-slate-50 border border-slate-100 rounded-[1.5rem] hover:bg-indigo-50 hover:border-indigo-100 cursor-pointer transition-all group ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-slate-400 group-hover:bg-indigo-600 group-hover:text-white shadow-sm transition-all">
+                      <div className="flex items-center gap-4 flex-1">
+                        <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-slate-400 group-hover:bg-indigo-600 group-hover:text-white shadow-sm transition-all flex-shrink-0">
                           <FaUser />
                         </div>
-                        <div>
-                          <p className="font-black text-slate-800 text-sm leading-tight">{student.name}</p>
-                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">
-                            {student.course} • Roll: {student.rollNumber}
+                        <div className="min-w-0">
+                          <p className="font-black text-slate-800 text-sm leading-tight truncate">{student.name}</p>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 truncate">
+                            {student.course || 'N/A'} • Roll: {student.rollNumber || 'N/A'}
                           </p>
                         </div>
                       </div>
-                      <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-indigo-600 opacity-0 group-hover:opacity-100 transition-all border border-indigo-100">
+                      <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-indigo-600 opacity-0 group-hover:opacity-100 transition-all border border-indigo-100 flex-shrink-0">
                         <FaPlus size={10} />
                       </div>
                     </div>
@@ -487,6 +529,7 @@ const BedAllocation = () => {
                   <div className="text-center py-12 border-2 border-dashed border-slate-100 rounded-[2rem]">
                     <FaExclamationCircle className="text-slate-100 text-4xl mx-auto mb-3" />
                     <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">No unallocated students identified</p>
+                    <p className="text-[9px] text-slate-400 mt-2">Total students in system: {students.length}</p>
                   </div>
                 )}
               </div>

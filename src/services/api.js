@@ -188,7 +188,8 @@ export const hostelAllocationAPI = {
   getById: (id) => api.get(`/api/hostel-allocation/${id}`),
   allocate: (data) => api.post('/api/hostel-allocation/allocate', data),
   update: (id, data) => api.put(`/api/hostel-allocation/update/${id}`, data),
-  cancel: (id) => api.patch(`/api/hostel-allocation/cancel/${id}`)
+  cancel: (id) => api.patch(`/api/hostel-allocation/cancel/${id}`),
+  getAllocatedStudents: (params) => api.get('/api/hostel-allocation/allocated-students', { params })
 };
 
 // Hostel APIs
