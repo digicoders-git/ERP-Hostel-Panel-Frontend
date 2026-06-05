@@ -16,7 +16,8 @@ const PersonalAttendanceHistory = () => {
         try {
             setLoading(true);
             const token = localStorage.getItem('token') || localStorage.getItem('wardenToken');
-            const { data } = await axios.get('http://localhost:5002/api/staff-panel/attendance-staff/my-history', {
+            const apiBase = import.meta.env.VITE_API_BASE_URL || 'https://erp-backend-0ab5.onrender.com';
+            const { data } = await axios.get(`${apiBase}/api/staff-panel/attendance-staff/my-history`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             if (data.success) {
